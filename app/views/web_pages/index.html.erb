@@ -1,9 +1,9 @@
 <header>
   <h1>Web Page Analyzer</h1>
-  <form method="post" action="#">
-    <input type="url" name="url" placeholder="Enter the URL..." required>
-    <button type="submit">Analyze</button>
-  </form>
+  <%= form_with(url: analyses_path, scope: :analysis, method: :post) do |form| %>
+    <%= form.url_field :url, placeholder: "Enter the URL...", required: true %>
+    <%= form.button "Analyze", type: "submit" %>
+  <% end %>
 </header>
 
 <main>
