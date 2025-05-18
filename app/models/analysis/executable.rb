@@ -11,8 +11,9 @@ module Analysis::Executable
   private
 
   def extract_html
+    self.status = Analysis.statuses[:fetching]
+    save!
     @html = Harvester.extract_html_from(web_page.url)
-    puts "HTML extracted, #{@html}"
   end
 
   def extract_data
