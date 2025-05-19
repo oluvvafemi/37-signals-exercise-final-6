@@ -1,7 +1,12 @@
 class Oracle
+  class AnalysisError < StandardError; end
+
   class << self
     def process(data)
       compute_results(data)
+    rescue StandardError => e
+      Rails.logger.error("Error while analyzing page data: #{e.message}")
+      raise AnalysisError, "Error while analyzing page data"
     end
 
     private

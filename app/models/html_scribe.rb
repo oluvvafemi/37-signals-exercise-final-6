@@ -1,11 +1,15 @@
 require "nokogiri"
 
 class HtmlScribe
+  class ParseError < StandardError; end
   class << self
     def extract_data_from(html_string)
       ensure_html_presence(html_string)
       doc = parse_html(html_string)
       package_data(doc)
+    rescue StandardError => e
+      Rails.logger.error("Error while parsing HTML: #{e.message}")
+      raise ParseError, "Error while parsing HTML"
     end
 
     private

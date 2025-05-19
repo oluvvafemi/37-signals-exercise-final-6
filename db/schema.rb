@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_05_17_153555) do
+ActiveRecord::Schema[8.0].define(version: 2025_05_19_155743) do
   create_table "analyses", force: :cascade do |t|
     t.string "title"
     t.integer "word_count"
@@ -20,6 +20,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_17_153555) do
     t.text "top_word_frequencies"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text "error_message"
     t.index ["status"], name: "index_analyses_on_status"
     t.index ["web_page_id"], name: "index_analyses_on_web_page_id"
   end

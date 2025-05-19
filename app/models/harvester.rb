@@ -44,19 +44,19 @@ class Harvester
           status_code = error.io.status[0].to_i
         end
         if status_code && RETRYABLE_HTTP_CODES.include?(status_code)
-          raise RetryableError, "Retryable HTTP Error #{status_code} for '#{url}'. #{original_error_info}"
+          raise RetryableError, "Retryable HTTP Error #{status_code} while fetching content from '#{url}'"
         else
-          raise FatalError, "Non-retryable HTTP Error #{status_code || 'Unknown'} for '#{url}'. #{original_error_info}"
+          raise FatalError, "Non-retryable HTTP Error #{status_code || 'Unknown'} while fetching content from '#{url}'"
         end
 
       when Timeout::Error, Errno::ETIMEDOUT
-        raise RetryableError, "Timeout error for '#{url}'. #{original_error_info}"
+        raise RetryableError, "Timeout error while fetching content from '#{url}'"
 
       when SocketError, Errno::ECONNREFUSED, Errno::ECONNRESET, Errno::EHOSTUNREACH, OpenSSL::SSL::SSLError
-        raise RetryableError, "Network/SSL error for '#{url}'. #{original_error_info}"
+        raise RetryableError, "Network/SSL error while fetching content from '#{url}'"
 
       else
-        raise FatalError, "An unexpected error occurred for '#{url}'. #{original_error_info}"
+        raise FatalError, "Error while fetching content from '#{url}'"
       end
     end
   end
