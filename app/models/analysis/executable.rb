@@ -18,16 +18,14 @@ module Analysis::Executable
 
   def extract_data
     @data = HtmlScribe.extract_data_from(@html)
-    puts "Data extracted, #{@data}"
   end
 
   def process_data
     @result = Oracle.process(@data)
-    puts "Result processed, #{@result}"
   end
 
   def save_result!
-    self.status = @result[:status]
+    self.status = :completed
     self.word_count = @result[:word_count]
     self.title = @result[:title]
     self.table_of_contents = @result[:table_of_contents]
