@@ -10,7 +10,7 @@ class HtmlScribe
     aside.toc
   ].freeze
 
-  HEADING_LEVELS_FOR_TOC = (2..5).freeze
+  HEADING_LEVELS_FOR_TOC = (2..6).freeze
 
   NOISE_SELECTORS = %w[
     script style noscript iframe
