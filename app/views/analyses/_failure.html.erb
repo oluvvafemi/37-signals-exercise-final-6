@@ -1,0 +1,8 @@
+<div class="failed-state" style="padding: 20px; border: 1px solid red; background-color: #ffeeee; color: #cc0000;">
+  <p>Analysis failed due to:</p>
+  <% if error_message.present? %>
+    <strong><p><%= error_message %></p></strong>
+  <% else %>
+    <strong><p>an unexpected error occurred.</p></strong>
+  <% end %>
+</div>

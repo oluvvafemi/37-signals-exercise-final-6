@@ -1,0 +1,10 @@
+<ol>
+  <% toc_items.each do |item| %>
+    <li>
+      <%= item["text"] %>
+      <% if item["children"].present? && item["children"].any? %>
+        <%= render partial: "analyses/table_of_contents", locals: { toc_items: item["children"] } %>
+      <% end %>
+    </li>
+  <% end %>
+</ol> 

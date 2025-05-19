@@ -19,8 +19,8 @@ class Analysis < ApplicationRecord
   private
 
   def broadcast_update
-    broadcast_replace_later target: "analysis_status_details",
-                            partial: "analyses/analysis_status",
-                            locals: { analysis: self }
+    broadcast_replace target: "analysis_details",
+                     partial: "analyses/analysis",
+                     locals: { analysis: self }
   end
 end

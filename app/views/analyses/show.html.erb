@@ -1,3 +1,12 @@
-<h1>Analyses#show</h1>
+<%= turbo_stream_from @analysis %>
 
-<%= @analysis.inspect %>
+<div style="margin-bottom: 20px;">
+  <% if @analysis.web_page %>
+    <%= link_to '← Back to homepage', root_path, class: 'btn btn-secondary' %>
+  <% end %>
+</div>
+
+
+<%= render partial: "analyses/analysis", locals: { analysis: @analysis } %>
+
+

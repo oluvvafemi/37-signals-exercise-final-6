@@ -1,0 +1,10 @@
+<div id="analysis_details">
+  <% case analysis.status.to_sym %>
+  <% when :pending, :fetching, :parsing, :analyzing %>
+    <%= render partial: "analyses/processing", locals: { status: analysis.status } %>
+  <% when :failed %>
+    <%= render partial: "analyses/failure", locals: { error_message: analysis.error_message } %>
+  <% when :completed %>
+    <%= render partial: "analyses/complete", locals: { analysis: analysis } %>
+  <% end %>
+</div>
