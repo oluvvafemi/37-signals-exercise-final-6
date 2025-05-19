@@ -13,7 +13,6 @@ class AnalysesController < ApplicationController
 
   def update
     @analysis.web_page.initiate_analysis
-    redirect_to analysis_path(@analysis)
   end
 
   private

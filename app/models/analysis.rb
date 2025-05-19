@@ -14,7 +14,7 @@ class Analysis < ApplicationRecord
     completed
   ].index_by(&:itself), default: :pending
 
-  after_update_commit :broadcast_update
+  after_update_commit :broadcast_update, if: -> { saved_change_to_status? }
 
   private
 
