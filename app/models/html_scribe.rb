@@ -54,10 +54,7 @@ class HtmlScribe
     end
 
     def extract_table_of_contents(doc)
-      toc = try_extracting_explicit_toc(doc)
-      return toc if toc.any?
-
-      extract_toc_from_headings(doc)
+      try_extracting_explicit_toc(doc).presence || extract_toc_from_headings(doc)
     end
 
     def extract_body(doc)
@@ -78,7 +75,7 @@ class HtmlScribe
         links = container.css("a")
         next unless links.any? && links.all? { |a| a["href"].to_s.start_with?("#") }
 
-        list_element = container.at_css("> ul, > ol") || container.at_css("ul, ol")
+        list_element = container.at_xpath("./ul | ./ol") || container.at_xpath(".//ul | .//ol")
         next unless list_element
 
         toc_nodes = parse_toc_list_items_hierarchically(list_element, 1)
@@ -124,19 +121,10 @@ class HtmlScribe
         text = heading_element.text&.strip
         next if text.nil? || text.empty?
 
-        current_node = { text: text, level: level, children: [] }
-
-        while !parent_stack.empty? && parent_stack.last[:level] >= current_node[:level]
-          parent_stack.pop
-        end
-
-        if parent_stack.empty?
-          root_nodes << current_node
-        else
-          parent_stack.last[:children] << current_node
-        end
-
-        parent_stack << current_node
+        node = { text: text, level: level, children: [] }
+        parent_stack.pop while parent_stack.any? && parent_stack.last[:level] >= level
+        (parent_stack.empty? ? root_nodes : parent_stack.last[:children]) << node
+        parent_stack << node
       end
       root_nodes
     end
