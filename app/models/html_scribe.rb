@@ -1,25 +1,6 @@
 require "nokogiri"
 
 class HtmlScribe
-  class ParseError < StandardError; end
-
-  TOC_CONTAINER_SELECTORS = %w[
-    #toc .toc
-    #table-of-contents .table-of-contents
-    nav[role="doc-toc"] nav[aria-label="Table of contents"]
-    aside.toc
-  ].freeze
-
-  HEADING_LEVELS_FOR_TOC = (2..6).freeze
-
-  NOISE_SELECTORS = %w[
-    script style noscript iframe
-    header footer nav aside form
-    [hidden]
-    [style*="display:none"]
-    [style*="visibility:hidden"]
-  ].freeze
-
   class << self
     def extract_data_from(html_string)
       ensure_html_presence(html_string)
@@ -154,4 +135,23 @@ class HtmlScribe
          .join("\n")
     end
   end
+
+  TOC_CONTAINER_SELECTORS = %w[
+    #toc .toc
+    #table-of-contents .table-of-contents
+    nav[role="doc-toc"] nav[aria-label="Table of contents"]
+    aside.toc
+  ].freeze
+
+  HEADING_LEVELS_FOR_TOC = (2..6).freeze
+
+  NOISE_SELECTORS = %w[
+    script style noscript iframe
+    header footer nav aside form
+    [hidden]
+    [style*="display:none"]
+    [style*="visibility:hidden"]
+  ].freeze
+
+  class ParseError < StandardError; end
 end

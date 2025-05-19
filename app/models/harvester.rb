@@ -2,19 +2,7 @@ require "open-uri"
 require "uri"
 
 class Harvester
-  class RetryableError < StandardError; end
-  class FatalError < StandardError; end
   class << self
-    DEFAULT_TIMEOUT = 10
-    RETRYABLE_HTTP_CODES = [ 408, 429, 500, 502, 503, 504 ].freeze
-
-    MONITORED_EXCEPTIONS = [
-      OpenURI::HTTPError,
-      Timeout::Error, Errno::ETIMEDOUT,
-      SocketError, Errno::ECONNREFUSED, Errno::ECONNRESET,
-      Errno::EHOSTUNREACH, OpenSSL::SSL::SSLError
-    ].freeze
-
     def extract_html_from(url)
       fetch_content(url)
     rescue *MONITORED_EXCEPTIONS => e
@@ -60,4 +48,17 @@ class Harvester
       end
     end
   end
+
+  DEFAULT_TIMEOUT = 10
+  RETRYABLE_HTTP_CODES = [ 408, 429, 500, 502, 503, 504 ].freeze
+
+  MONITORED_EXCEPTIONS = [
+    OpenURI::HTTPError,
+    Timeout::Error, Errno::ETIMEDOUT,
+    SocketError, Errno::ECONNREFUSED, Errno::ECONNRESET,
+    Errno::EHOSTUNREACH, OpenSSL::SSL::SSLError
+  ].freeze
+
+  class RetryableError < StandardError; end
+  class FatalError < StandardError; end
 end

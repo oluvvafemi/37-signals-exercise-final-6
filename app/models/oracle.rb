@@ -1,12 +1,4 @@
 class Oracle
-  class AnalysisError < StandardError; end
-
-  STOP_WORDS = Set.new(%w[
-    a an and are as at be but by for from had has have he her hers him his i if in is
-    it its of on or that the their them they this to was were will with you your
-  ]).freeze
-
-  WORD_RE = /[[:alpha:]]{2,}/u
   class << self
     def process(data)
       compute_results(data)
@@ -48,4 +40,13 @@ class Oracle
       top_10_pairs.to_h
     end
   end
+
+  STOP_WORDS = Set.new(%w[
+    a an and are as at be but by for from had has have he her hers him his i if in is
+    it its of on or that the their them they this to was were will with you your
+  ]).freeze
+
+  WORD_RE = /[[:alpha:]]{2,}/u
+
+  class AnalysisError < StandardError; end
 end
