@@ -14,10 +14,19 @@ class AnalysisJob < ApplicationJob
 
   def mark_analysis_as_failed(job, error)
     if job.arguments.first
+      error_message = set_error_message(error)
       job.arguments.first.update(
         status: "failed",
-        error_message: error.message
+        error_message: error_message
       )
+    end
+  end
+
+  def set_error_message(error)
+    if error.is_a?(Harvester::RetryableError) || error.is_a?(Harvester::FatalError) || error.is_a?(HtmlScribe::ParseError) || error.is_a?(Oracle::AnalysisError)
+      error.message
+    else
+      "Internal server error"
     end
   end
 end
