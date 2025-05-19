@@ -14,6 +14,13 @@ class Harvester
       classify_and_raise_error(e, url)
     end
 
+    def clean_url(raw_url)
+      uri = URI.parse(raw_url)
+      uri.fragment = nil
+      uri.query = nil
+      uri.to_s
+    end
+
     private
 
     def ensure_safe_url(url)

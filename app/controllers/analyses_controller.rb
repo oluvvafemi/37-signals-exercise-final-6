@@ -1,4 +1,5 @@
 class AnalysesController < ApplicationController
+  before_action :remove_url_fragments_and_query_params, only: %i[create]
   before_action :redirect_if_analyzed, only: %i[create]
   before_action :create_web_page, only: %i[create]
   before_action :set_analysis, except: %i[create]
@@ -22,7 +23,7 @@ class AnalysesController < ApplicationController
   end
 
   def redirect_if_analyzed
-    web_page = WebPage.find_by(url: analysis_params[:url])
+    web_page = WebPage.find_by(url: @url)
 
     if web_page
       redirect_to analysis_path(web_page.analysis)
@@ -30,7 +31,11 @@ class AnalysesController < ApplicationController
   end
 
   def create_web_page
-    @web_page = WebPage.create!(url: analysis_params[:url])
+    @web_page = WebPage.create!(url: @url)
+  end
+
+  def remove_url_fragments_and_query_params
+    @url = Harvester.clean_url(analysis_params[:url])
   end
 
   def set_analysis
