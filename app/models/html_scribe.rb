@@ -2,6 +2,24 @@ require "nokogiri"
 
 class HtmlScribe
   class ParseError < StandardError; end
+
+  TOC_CONTAINER_SELECTORS = %w[
+    #toc .toc
+    #table-of-contents .table-of-contents
+    nav[role="doc-toc"] nav[aria-label="Table of contents"]
+    aside.toc
+  ].freeze
+
+  HEADING_LEVELS_FOR_TOC = (2..5).freeze
+
+  NOISE_SELECTORS = %w[
+    script style noscript iframe
+    header footer nav aside form
+    [hidden]
+    [style*="display:none"]
+    [style*="visibility:hidden"]
+  ].freeze
+
   class << self
     def extract_data_from(html_string)
       ensure_html_presence(html_string)
@@ -43,31 +61,22 @@ class HtmlScribe
     end
 
     def extract_body(doc)
-      body_text_content = ""
-      body_clone = doc.at_css("body")&.dup
+      root = content_root(doc) || doc
+      return "" unless root
 
-      if body_clone
-        body_clone.css("script, style").remove
-        raw_text = body_clone.text
+      root = root.dup
+      scrub!(root)
 
-        if raw_text && !raw_text.empty?
-          body_text_content = raw_text.gsub(/[ \t\r\f]+/, " ")
-                                    .gsub(/\n\s*\n+/, "\n\n")
-                                    .lines.map(&:strip).reject(&:empty?).join("\n")
-        end
-      end
-      body_text_content
+      root.css("br").each { |br| br.replace("\n") }
+      squeeze_whitespace(root.inner_text)
     end
 
     def try_extracting_explicit_toc(doc)
-      explicit_toc_container_selectors = [
-        "#toc", ".toc",
-        "#table-of-contents", ".table-of-contents"
-      ]
+      explicit_toc_container = safe_css(doc, TOC_CONTAINER_SELECTORS.join(","))
 
-      explicit_toc_container_selectors.each do |selector|
-        container = doc.at_css(selector)
-        next unless container
+      explicit_toc_container.each do |container|
+        links = container.css("a")
+        next unless links.any? && links.all? { |a| a["href"].to_s.start_with?("#") }
 
         list_element = container.at_css("> ul, > ol") || container.at_css("ul, ol")
         next unless list_element
@@ -104,10 +113,13 @@ class HtmlScribe
     end
 
     def extract_toc_from_headings(doc)
+      root = content_root(doc) || doc
       root_nodes = []
       parent_stack = []
 
-      doc.css("h2, h3, h4").each do |heading_element|
+      heading_selector = HEADING_LEVELS_FOR_TOC.map { |l| "h#{l}[id]" }.join(",")
+
+      root.css(heading_selector).each do |heading_element|
         level = heading_element.name[1].to_i
         text = heading_element.text&.strip
         next if text.nil? || text.empty?
@@ -127,6 +139,31 @@ class HtmlScribe
         parent_stack << current_node
       end
       root_nodes
+    end
+
+    def safe_css(node, selector)
+      node.css(selector)
+    rescue Nokogiri::CSS::SyntaxError
+      []
+    end
+
+    def content_root(doc)
+      doc.at_css("main")             ||
+      doc.at_css("article")          ||
+      doc.at_css('[role="main"]')    ||
+      doc.at_css("body")
+    end
+
+    def scrub!(node)
+      node.css(NOISE_SELECTORS.join(",")).each(&:remove)
+    end
+
+    def squeeze_whitespace(str)
+      str.gsub(/[ \t\r\f]+/, " ")
+         .gsub(/\n\s*\n+/, "\n\n")
+         .lines.map(&:strip)
+         .reject(&:empty?)
+         .join("\n")
     end
   end
 end
