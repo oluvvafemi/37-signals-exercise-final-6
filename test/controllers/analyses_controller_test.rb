@@ -8,25 +8,27 @@ class AnalysesControllerTest < ActionDispatch::IntegrationTest
     new_url = "http://example.com/new-page-for-analysis"
     assert_nil WebPage.find_by(url: new_url)
 
-    assert_difference [ "WebPage.count", "Analysis.count" ], 1 do
-      assert_enqueued_jobs 1, only: AnalysisJob do
-        post analyses_url, params: { analysis: { url: new_url } }
+    assert_difference -> { WebPage.count }, 1 do
+      assert_difference -> { Analysis.count }, 1 do
+        assert_enqueued_jobs 1, only: AnalysisJob do
+          post analyses_url, params: { analysis: { url: new_url } }
+        end
       end
     end
 
     created_web_page = WebPage.find_by(url: new_url)
     assert_not_nil created_web_page
-    assert_equal 1, created_web_page.analyses.count
-    new_analysis = created_web_page.analyses.first
+    assert_not_nil created_web_page.analysis, "WebPage should have an associated analysis"
+    new_analysis = created_web_page.analysis
     assert_not_nil new_analysis
 
     assert_redirected_to analysis_path(new_analysis)
   end
 
-  test "POST #create with an existing URL redirects to its latest analysis and does not create new records" do
+  test "POST #create with an existing URL redirects to its analysis and does not create new records or jobs" do
     existing_url = "http://example.com/already-analyzed"
     web_page = WebPage.create!(url: existing_url)
-    latest_analysis = web_page.initiate_analysis
+    existing_analysis = web_page.analysis
 
     clear_enqueued_jobs
 
@@ -36,7 +38,7 @@ class AnalysesControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
-    assert_redirected_to analysis_path(latest_analysis)
+    assert_redirected_to analysis_path(existing_analysis)
   end
 
   test "POST #create with an invalid URL (e.g., blank) results in unprocessable_content response" do
@@ -59,8 +61,7 @@ class AnalysesControllerTest < ActionDispatch::IntegrationTest
 
   test "GET #show for an existing analysis displays analysis details" do
     web_page = WebPage.create!(url: "http://example.com/show-test-for-analysis")
-    analysis = web_page.initiate_analysis
-    clear_enqueued_jobs
+    analysis = web_page.analysis
 
     get analysis_path(analysis)
 
