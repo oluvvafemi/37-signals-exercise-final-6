@@ -1,5 +1,4 @@
 class AnalysisJob < ApplicationJob
-  queue_as :default
   retry_on Harvester::RetryableError, wait: 5.seconds, attempts: 3
 
   after_discard do |job, error|
