@@ -9,6 +9,13 @@ class WebPage < ApplicationRecord
     AnalysisJob.perform_later(self.analysis)
   end
 
+  scope :with_recently_completed_analysis, -> {
+    joins(:analysis)
+    .where(analysis: { status: :completed })
+    .order("analysis.updated_at DESC")
+    .limit(25)
+  }
+
   private
 
   def create_analysis
