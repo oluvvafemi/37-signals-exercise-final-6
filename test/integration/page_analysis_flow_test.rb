@@ -26,8 +26,8 @@ class PageAnalysisFlowTest < ActionDispatch::IntegrationTest
     assert_not_nil new_analysis
 
     Harvester.stub(:extract_html_from, "<html><head><title>#{mock_title_for_nav_test}</title></head><body>Mock body for nav</body></html>") do
-      HtmlScribe.stub(:extract_data_from, { title: mock_title_for_nav_test, body: "Mock body for nav test", table_of_contents: [] }) do
-        Oracle.stub(:process, { title: mock_title_for_nav_test, word_count: 4, table_of_contents: [], top_word_frequencies: { "mock"=>1, "body"=>1 } }) do
+      HtmlScribe.stub(:extract_data_from, { title: mock_title_for_nav_test, page_content: "Mock body for nav test", table_of_contents: [] }) do
+        Oracle.stub(:process, { title: mock_title_for_nav_test, word_count: 5, table_of_contents: [], top_word_frequencies: { "mock"=>1, "body"=>1, "for"=>1, "nav"=>1, "test"=>1 } }) do
           perform_enqueued_jobs
         end
       end
@@ -36,6 +36,7 @@ class PageAnalysisFlowTest < ActionDispatch::IntegrationTest
     new_analysis.reload
     assert_equal "completed", new_analysis.status
     assert_equal mock_title_for_nav_test, new_analysis.title
+    assert_equal 5, new_analysis.word_count
 
     assert_redirected_to analysis_path(new_analysis)
     follow_redirect!
@@ -43,6 +44,7 @@ class PageAnalysisFlowTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "div.completed-state header h1", mock_title_for_nav_test
     assert_select "div.completed-state header p a[href=?]", new_url, text: new_url
+    assert_select "div.completed-state section p", "5 words"
   end
 
   test "submitting a URL, performs analysis, and displays results" do
@@ -50,18 +52,17 @@ class PageAnalysisFlowTest < ActionDispatch::IntegrationTest
     get root_path
 
     mock_html_content = "<html><head><title>Test Title Complete</title></head><body><p>Hello world. This is a test for display.</p><h1>Main Heading Display</h1><ul><li>Item A</li><li>Item B</li></ul></body></html>"
-
     mock_extracted_data_for_scribe = {
       title: "Test Title Complete",
-      body: "Hello world. This is a test for display. Main Heading Display Item A Item B",
-      table_of_contents: [ { text: "Main Heading Display", level: 1, children: [] } ]
+      page_content: "Hello world. This is a test for display. Main Heading Display Item A Item B",
+      table_of_contents: [ { "text" => "Main Heading Display", "level" => 1, "children" => [] } ]
     }
 
     mock_analysis_result_for_oracle = {
       title: "Test Title Complete",
-      word_count: 7,
+      word_count: 15,
       table_of_contents: [ { "text" => "Main Heading Display", "level" => 1, "children" => [] } ],
-      top_word_frequencies: { "hello" => 1, "world" => 1, "this"=>1, "test" => 1, "for"=>1, "display" => 1 }
+      top_word_frequencies: { "hello" => 1, "world" => 1, "test" => 1, "display" => 1, "main" => 1, "heading" => 1, "item" => 2, "this" => 1 }
     }
 
     Harvester.stub(:extract_html_from, mock_html_content) do
