@@ -13,7 +13,7 @@
       <ul>
         <% @web_pages.each do |web_page| %>
           <li>
-            <%= link_to (web_page.analysis.title ), web_page.analysis, target: "_blank", rel: "noopener"%>
+            <%= link_to web_page.analysis.title, web_page.analysis, target: "_blank", rel: "noopener"%>
           </li>
         <% end %>
       </ul>
