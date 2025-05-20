@@ -10,7 +10,7 @@ class Oracle
     private
 
     def compute_results(data)
-      words = extract_words(data[:body])
+      words = extract_words(data[:page_content])
       {
         word_count: compute_word_count(words),
         title: data[:title],

@@ -21,7 +21,7 @@ class HtmlScribe
       {
         title: extract_title(doc),
         table_of_contents: extract_table_of_contents(doc),
-        body: extract_body(doc)
+        page_content: extract_page_content(doc)
       }
     end
 
@@ -38,7 +38,7 @@ class HtmlScribe
       try_extracting_explicit_toc(doc).presence || extract_toc_from_headings(doc)
     end
 
-    def extract_body(doc)
+    def extract_page_content(doc)
       root = content_root(doc) || doc
       return "" unless root
 
@@ -148,6 +148,7 @@ class HtmlScribe
   NOISE_SELECTORS = %w[
     script style noscript iframe
     header footer nav aside form
+    #toc .toc #table-of-contents .table-of-contents
     [hidden]
     [style*="display:none"]
     [style*="visibility:hidden"]
