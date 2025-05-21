@@ -3,7 +3,7 @@ module WebPage::Analyzable
 
   included do
     has_one :analysis, dependent: :destroy
-    after_create :create_analysis
+    after_create :create_analysis_record
 
     scope :most_recently_analyzed, -> {
       joins(:analysis)
@@ -19,7 +19,7 @@ module WebPage::Analyzable
 
   private
 
-  def create_analysis
+  def create_analysis_record
     Analysis.create!(web_page: self)
   end
 end
