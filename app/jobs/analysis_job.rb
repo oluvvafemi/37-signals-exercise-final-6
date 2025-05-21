@@ -22,7 +22,10 @@ class AnalysisJob < ApplicationJob
   end
 
   def set_error_message(error)
-    if error.is_a?(Harvester::RetryableError) || error.is_a?(Harvester::FatalError) || error.is_a?(HtmlScribe::ParseError) || error.is_a?(Oracle::AnalysisError)
+    if error.is_a?(Harvester::RetryableError) ||
+       error.is_a?(Harvester::FatalError)     ||
+       error.is_a?(HtmlScribe::ParseError)    ||
+       error.is_a?(Oracle::AnalysisError)
       error.message
     else
       "Internal server error"

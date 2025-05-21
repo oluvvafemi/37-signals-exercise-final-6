@@ -9,7 +9,7 @@ module Analysis::Broadcastable
 
   def broadcast_update
     broadcast_replace target: "analysis_details",
-                     partial: "analyses/analysis",
-                     locals: { analysis: self }
+                      partial: "analyses/analysis",
+                      locals: { analysis: self }
   end
 end

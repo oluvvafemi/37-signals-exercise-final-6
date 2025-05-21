@@ -42,8 +42,6 @@ class Harvester
     end
 
     def classify_and_raise_error(error, url)
-      original_error_info = "Original: #{error.class} - #{error.message}"
-
       case error
       when OpenURI::HTTPError
         status_code = nil
