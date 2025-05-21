@@ -137,3 +137,21 @@ button:hover {
   margin: 0;
   font-style: italic;
 }
+
+.loading-state {
+  padding: 20px;
+  text-align: center;
+}
+
+.loading-state p {
+  font-size: 1.2em;
+}
+
+.failed-state {
+  padding: 20px;
+  border: 1px solid red;
+  color: #cc0000;
+}
+
+
+
