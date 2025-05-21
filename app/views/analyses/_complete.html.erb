@@ -1,51 +1,5 @@
 <div class="completed-state">
-  <header>
-    <h1><%= analysis.title %></h1>
-    <% if analysis.web_page&.url.present? %>
-      <p><a href="<%= analysis.web_page.url %>" target="_blank" rel="noopener"><%= analysis.web_page.url %></a></p>
-    <% end %>
+  <%= render partial: "analyses/header", locals: { analysis: analysis } %>
 
-    <div class="analysis-actions">
-      <p>Last analyzed on <%= analysis.updated_at.strftime("%B %d, %Y at %I:%M %p") %></p>
-      <%= button_to "Analyze again", analysis_path(analysis), method: :put, class: "btn btn-primary" %>
-    </div>
-  </header>
-
-  <main>
-    <% if analysis.table_of_contents.present? && analysis.table_of_contents.any? %>
-      <section>
-        <h2>Table of Contents</h2>
-        <%= render partial: "analyses/table_of_contents", locals: { toc_items: analysis.table_of_contents } %>
-      </section>
-    <% end %>
-
-    <% if analysis.word_count.present? %>
-      <section>
-        <h2>Total Word Count</h2>
-        <p><%= number_with_delimiter(analysis.word_count) %> words</p>
-      </section>
-    <% end %>
-
-    <% if analysis.top_word_frequencies.present? && analysis.top_word_frequencies.any? %>
-      <section>
-        <h2>Top 10 Most Frequent Words</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Word</th>
-              <th>Count</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% analysis.top_word_frequencies.each do |word, count| %>
-              <tr>
-                <td><%= word.to_s.humanize %></td>
-                <td><%= count %></td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
-      </section>
-    <% end %>
-  </main>
+  <%= render partial: "analyses/main", locals: { analysis: analysis } %>
 </div>

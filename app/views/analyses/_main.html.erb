@@ -1,0 +1,21 @@
+<main>
+  <% if analysis.table_of_contents.present? && analysis.table_of_contents.any? %>
+    <section>
+      <h2>Table of Contents</h2>
+      <%= render partial: "analyses/table_of_contents", locals: { toc_items: analysis.table_of_contents } %>
+    </section>
+  <% end %>
+
+  <% if analysis.word_count.present? %>
+    <section>
+      <h2>Total Word Count</h2>
+      <p><%= number_with_delimiter(analysis.word_count) %> words</p>
+    </section>
+  <% end %>
+
+  <% if analysis.top_word_frequencies.present? && analysis.top_word_frequencies.any? %>
+    <section>
+      <%= render partial: "analyses/top_word_frequencies", locals: { analysis: analysis } %>
+    </section>
+  <% end %>
+</main>

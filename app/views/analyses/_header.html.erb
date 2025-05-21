@@ -1,0 +1,9 @@
+<header>
+  <h1><%= analysis.title %></h1>
+  <p><a href="<%= analysis.web_page.url %>" target="_blank" rel="noopener"><%= analysis.web_page.url %></a></p>
+
+  <div class="analysis-actions">
+    <p>Last analyzed on <%= analysis.updated_at.strftime("%B %d, %Y at %I:%M %p") %></p>
+    <%= button_to "Analyze again", analysis_path(analysis), method: :put, class: "btn btn-primary" %>
+  </div>
+</header>
