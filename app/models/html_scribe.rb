@@ -64,6 +64,7 @@ class HtmlScribe
       root.css(heading_selector).each do |heading_element|
         level = heading_element.name[1].to_i
         text = heading_element.text&.strip
+        text&.gsub(/^\d+(((\.\d+)+)\.?|\.)\s*/, "")
         next if text.nil? || text.empty?
 
         node = { text: text, level: level, children: [] }
@@ -151,13 +152,15 @@ class HtmlScribe
 
     def extract_text_from_link_in(list_item)
       link = list_item.at_xpath("./a")
-      link&.text&.strip
+      text = link&.text&.strip
+      text&.gsub(/^\d+(((\.\d+)+)\.?|\.)\s*/, "")
     end
 
     def extract_text_of(list_item)
       temp_li_for_text = li_item.dup
       temp_li_for_text.xpath("./ul | ./ol").remove
-      temp_li_for_text.text&.strip
+      text = temp_li_for_text.text&.strip
+      text&.gsub(/^\d+(((\.\d+)+)\.?|\.)\s*/, "")
     end
 
     def extract_nested_list_from(list_item)
