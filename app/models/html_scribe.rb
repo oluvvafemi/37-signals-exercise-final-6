@@ -39,14 +39,13 @@ class HtmlScribe
     end
 
     def extract_page_content(doc)
-      root = content_root(doc) || doc
+      root = get_content_root(doc)
       return "" unless root
 
       root = root.dup
-      scrub!(root)
-
-      root.css("br").each { |br| br.replace("\n") }
-      squeeze_whitespace(root.inner_text)
+      remove_non_content_elements!(root)
+      replace_br_with_newlines!(root)
+      normalize_whitespace(root.inner_text)
     end
 
     def try_extracting_explicit_toc(doc)
@@ -91,7 +90,7 @@ class HtmlScribe
     end
 
     def extract_toc_from_headings(doc)
-      root = content_root(doc) || doc
+      root = get_content_root(doc)
       root_nodes = []
       parent_stack = []
 
@@ -116,18 +115,23 @@ class HtmlScribe
       []
     end
 
-    def content_root(doc)
+    def get_content_root(doc)
       doc.at_css("main")             ||
       doc.at_css("article")          ||
       doc.at_css('[role="main"]')    ||
-      doc.at_css("body")
+      doc.at_css("body")             ||
+      doc
     end
 
-    def scrub!(node)
+    def remove_non_content_elements!(node)
       node.css(NOISE_SELECTORS.join(",")).each(&:remove)
     end
 
-    def squeeze_whitespace(str)
+    def replace_br_with_newlines!(node)
+      node.css("br").each { |br| br.replace("\n") }
+    end
+
+    def normalize_whitespace(str)
       str.gsub(/[ \t\r\f]+/, " ")
          .gsub(/\n\s*\n+/, "\n\n")
          .lines.map(&:strip)
