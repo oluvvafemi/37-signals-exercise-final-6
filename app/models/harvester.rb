@@ -93,7 +93,7 @@ class Harvester
     Errno::EHOSTUNREACH, OpenSSL::SSL::SSLError
   ].freeze
 
-  class RetryableError < StandardError; end
-  class FatalError < StandardError; end
-  class UnsafeURLError < StandardError; end
+  class RetryableError < KnownDomainError; end
+  class FatalError < KnownDomainError; end
+  class UnsafeURLError < KnownDomainError; end
 end

@@ -54,5 +54,5 @@ class Oracle
 
   WORD_RE = /[[:alpha:]]{2,}/u
 
-  class AnalysisError < StandardError; end
+  class AnalysisError < KnownDomainError; end
 end

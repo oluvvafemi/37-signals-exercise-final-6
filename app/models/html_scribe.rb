@@ -154,5 +154,5 @@ class HtmlScribe
     [style*="visibility:hidden"]
   ].freeze
 
-  class ParseError < StandardError; end
+  class ParseError < KnownDomainError; end
 end
