@@ -49,44 +49,9 @@ class HtmlScribe
     end
 
     def try_extracting_explicit_toc(doc)
-      explicit_toc_container = safe_css(doc, TOC_CONTAINER_SELECTORS.join(","))
+      toc_container_candidates = find_toc_container_candidates(doc)
 
-      explicit_toc_container.each do |container|
-        links = container.css("a")
-        next unless links.any? && links.all? { |a| a["href"].to_s.start_with?("#") }
-
-        list_element = container.at_xpath("./ul | ./ol") || container.at_xpath(".//ul | .//ol")
-        next unless list_element
-
-        toc_nodes = parse_toc_list_items_hierarchically(list_element, 1)
-        return toc_nodes if toc_nodes.any?
-      end
-      []
-    end
-
-    def parse_toc_list_items_hierarchically(list_element, current_level)
-      nodes = []
-      list_element.xpath("./li").each do |li_element|
-        main_link = li_element.at_xpath("./a")
-        item_text = main_link&.text&.strip
-
-        if item_text.nil? || item_text.empty?
-          temp_li_for_text = li_element.dup
-          temp_li_for_text.xpath("./ul | ./ol").remove
-          item_text = temp_li_for_text.text&.strip
-        end
-
-        next if item_text.nil? || item_text.empty?
-
-        node = { text: item_text, level: current_level, children: [] }
-
-        nested_list_element = li_element.at_xpath("./ul | ./ol")
-        if nested_list_element
-          node[:children] = parse_toc_list_items_hierarchically(nested_list_element, current_level + 1)
-        end
-        nodes << node
-      end
-      nodes
+      extract_toc_from(toc_container_candidates)
     end
 
     def extract_toc_from_headings(doc)
@@ -109,7 +74,7 @@ class HtmlScribe
       root_nodes
     end
 
-    def safe_css(node, selector)
+    def select_css_safely(node, selector)
       node.css(selector)
     rescue Nokogiri::CSS::SyntaxError
       []
@@ -125,6 +90,78 @@ class HtmlScribe
 
     def remove_non_content_elements!(node)
       node.css(NOISE_SELECTORS.join(",")).each(&:remove)
+    end
+
+    def find_toc_container_candidates(doc)
+      select_css_safely(doc, TOC_CONTAINER_SELECTORS.join(","))
+    end
+
+    def extract_toc_from(container_candidates)
+      container_candidates.each do |container|
+        next unless all_links_are_fragments?(container)
+
+        list_element = get_list_from(container)
+        next unless list_element
+
+        toc_nodes = parse_toc_list_items_hierarchically(list_element, 1)
+        return toc_nodes if toc_nodes.any?
+      end
+      []
+    end
+
+    def parse_toc_list_items_hierarchically(list_element, current_level)
+      list_items = get_list_items_from(list_element)
+      build_toc_nodes(list_items, current_level)
+    end
+
+    def build_toc_nodes(list_items, current_level)
+      nodes = []
+      list_items.each do |li_item|
+        item_text = get_text_from(li_item)
+        next if item_text.nil? || item_text.empty?
+
+        node = { text: item_text, level: current_level, children: [] }
+        nested_list_element = extract_nested_list_from(li_item)
+
+        if nested_list_element
+          node[:children] = parse_toc_list_items_hierarchically(nested_list_element, current_level + 1)
+        end
+        nodes << node
+      end
+      nodes
+    end
+
+    def all_links_are_fragments?(container)
+      links = container.css("a")
+      links.any? && links.all? { |a| a["href"].to_s.start_with?("#") }
+    end
+
+    def get_list_from(element)
+      element.at_xpath("./ul | ./ol") || element.at_xpath(".//ul | .//ol")
+    end
+
+    def get_list_items_from(list_element)
+      list_element.xpath("./li") || list_element.xpath(".//li")
+    end
+
+    def get_text_from(list_item)
+      extract_text_from_link_in(list_item) ||
+      extract_text_of(list_item)
+    end
+
+    def extract_text_from_link_in(list_item)
+      link = list_item.at_xpath("./a")
+      link&.text&.strip
+    end
+
+    def extract_text_of(list_item)
+      temp_li_for_text = li_item.dup
+      temp_li_for_text.xpath("./ul | ./ol").remove
+      temp_li_for_text.text&.strip
+    end
+
+    def extract_nested_list_from(list_item)
+      get_list_from(list_item)
     end
 
     def replace_br_with_newlines!(node)
