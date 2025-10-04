@@ -1,0 +1,10 @@
+<div class="failed-state">
+  <p>Analysis failed due to:</p>
+  <% if analysis.error_message.present? %>
+    <strong><p><%= analysis.error_message %></p></strong>
+  <% else %>
+    <strong><p>an unexpected error.</p></strong>
+  <% end %>
+
+  <%= button_to "Retry", analysis_path(analysis), method: :put, class: "btn btn-primary" %>
+</div>

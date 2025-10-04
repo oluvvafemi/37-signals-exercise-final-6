@@ -1,5 +1,6 @@
 # README
 
+Find [my PR Note here.](https://github.com/oluvvafemi/37-signals-exercise-final-6/pull/12)
 ## An app to analyze web pages
 
 This exercise is about building a Rails application that analyzes web pages. Users will enter 

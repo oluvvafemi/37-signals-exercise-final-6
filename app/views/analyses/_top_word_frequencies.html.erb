@@ -1,0 +1,17 @@
+<h2>Top 10 Most Frequent Words</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Word</th>
+      <th>Count</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% analysis.top_word_frequencies.each do |word, count| %>
+      <tr>
+        <td><%= word.to_s.humanize %></td>
+        <td><%= count %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

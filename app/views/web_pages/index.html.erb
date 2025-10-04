@@ -1,0 +1,24 @@
+<header>
+  <h1>Web Page Analyzer</h1>
+  <%= form_with(url: analyses_path, scope: :analysis, method: :post) do |form| %>
+    <%= form.url_field :url, placeholder: "Enter the URL...", required: true %>
+    <%= form.button "Analyze", type: "submit" %>
+  <% end %>
+</header>
+
+<main>
+  <section>
+    <h2>Previously Analyzed Pages</h2>
+    <% if @web_pages.any? %>
+      <ul>
+        <% @web_pages.each do |web_page| %>
+          <li>
+            <%= link_to web_page.analysis.title, web_page.analysis, target: "_blank", rel: "noopener"%>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p>No analyzed web pages yet.</p>
+    <% end %>
+  </section>
+</main>

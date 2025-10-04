@@ -1,0 +1,7 @@
+<%= turbo_stream_from @analysis %>
+
+<div style="margin-bottom: 20px;">
+  <%= link_to '← Back to homepage', root_path, class: 'btn btn-secondary' %>
+</div>
+
+<%= render partial: "analyses/analysis", locals: { analysis: @analysis } %>
